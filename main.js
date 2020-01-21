@@ -8,12 +8,56 @@ const settingStore = new Store({name: 'Settings'});
 const fileStore = new Store({name: 'files Data'});
 const qiniuConfig = ['accessKey', 'secretKey', 'bucketName'].every(k => !!settingStore.get(k));
 const QiuniuManager = require('./src/utils/QiniuManager');
+const { autoUpdater } = require('electron-updater')
 let mainWindow, settingsWindow;
 const createManager = () => {
     const {accessKey, secretKey, bucketName} = settingStore.get()
     return new QiuniuManager(accessKey, secretKey, bucketName)
 }
 app.on('ready', () => {
+    if(isDev) {
+        autoUpdater.updateConfigPath = path.join(__dirname, 'dev-app-update.yml')
+    }
+    autoUpdater.autoDownload = false
+    autoUpdater.checkForUpdates()
+    autoUpdater.on('error', (error) => {
+        dialog.showErrorBox('Error', error === null ? "unknown" : (error.stack || error).toString())
+    })
+    autoUpdater.on('checking-for-update', () => {
+        console.log('Checking for update...')
+    })
+    autoUpdater.on('update-available', () => {
+        dialog.showMessageBox({
+            type: 'info',
+            title: '应用有新的版本',
+            message: '发现新版本， 是否现在更新？',
+            buttons: ['是', '否']
+        }, (buttonIndex) => {
+            if(buttonIndex === 0) {
+                autoUpdater.downloadUpdate()
+            } 
+        })
+    })
+    autoUpdater.on('update-not-available', () => {
+        dialog.showMessageBox({
+            title: '没有新版本',
+            message: '当前已经是最新的版本'
+        })
+    })
+    autoUpdater.on('download-progress', (progressObj) => {
+        let log_message = "DownLoad speed:" + progressObj.bytesPerSecond;
+        log_message = log_message + '-Download' + progressObj.percent  + '&';
+        log_message = log_message + '(' + progressObj.transferred + '/' + progressObj.total + ')'
+        console.log(log_message)
+    })
+    autoUpdater.on('updaet-downloaded', () => {
+        dialog.showMessageBox({
+            title: '安装更新',
+            message: '更新下载完毕, 应用将重启并进行安装'
+        }, () => {
+            setImmediate(() => autoUpdater.quitAndInstall())
+        })
+    })
     const mainWindowConfig = {
         width: 1024,
         height: 680,

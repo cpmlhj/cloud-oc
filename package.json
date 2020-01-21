@@ -1,17 +1,17 @@
 {
   "name": "cloud-doc",
-  "version": "1.1.0",
+  "version": "1.1.5",
   "private": true,
   "main": "main.js",
   "description": "Online MarkDown",
+  "repository": "https://github.com/cpmlhj/cloud-oc",
   "author": {
     "name": "J",
     "email": "haojunliu007@gmail.com"
   },
-  "repository": "",
   "dependencies": {
-    "electron-store": "^5.0.0",
-    "bootstrap": "^4.3.1"
+    "bootstrap": "^4.3.1",
+    "electron-store": "^5.0.0"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -22,9 +22,11 @@
     "dev": "concurrently \" wait-on http://localhost:3000 && electron .\" \" cross-env BROWSER=none yarn start\"",
     "pack": "electron-builder --dir",
     "dist": "electron-builder",
-    "prepack": "yarn build && yarn run buildMain",
+    "prepack": "yarn build  && yarn run buildMain",
     "predist": "yarn build && yarn run buildMain",
-    "buildMain": "webpack"
+    "buildMain": "webpack",
+    "prerelease": "yarn build && yarn run buildMain",
+    "release": " cross-env GH_TOKEN=c6a3678fbbb5d609c0f3ae92b3b9d11647992891 electron-builder --win --ia32"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -47,7 +49,9 @@
     "directories": {
       "buildResources": "assets"
     },
-    "publish": ["github"],
+    "publish": [
+      "github"
+    ],
     "mac": {
       "category": "public.app-category.productivity",
       "artifactName": "${productName}-${version}-${arch}.${ext}"
@@ -106,22 +110,23 @@
     "@fortawesome/free-brands-svg-icons": "^5.10.2",
     "@fortawesome/free-solid-svg-icons": "^5.10.2",
     "@fortawesome/react-fontawesome": "^0.1.4",
+    "axios": "^0.19.0",
     "classnames": "^2.2.6",
     "concurrently": "^4.1.2",
     "cross-env": "^5.2.1",
     "electron": "^6.0.12",
     "electron-builder": "^21.2.0",
+    "electron-is-dev": "^1.1.0",
+    "electron-updater": "^4.1.2",
     "node-sass": "^4.12.0",
     "prop-types": "^15.7.2",
+    "qiniu": "^7.2.2",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
     "react-scripts": "3.1.1",
     "react-simplemde-editor": "^4.1.0",
     "uuid": "^3.3.3",
     "wait-on": "^3.3.0",
-    "webpack-cli": "^3.3.9",
-    "axios": "^0.19.0",
-    "electron-is-dev": "^1.1.0",
-    "qiniu": "^7.2.2"
+    "webpack-cli": "^3.3.9"
   }
 }
